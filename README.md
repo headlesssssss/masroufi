@@ -99,7 +99,7 @@ Suivez ces instructions étape par étape pour configurer et lancer le projet su
 
 ### 2. Récupération du projet
 ```bash
-git clone [https://github.com/votre-compte/masroufi.git](https://github.com/votre-compte/masroufi.git)
+git clone [https://github.com/headlesssssss/masroufi.git](https://github.com/headlesssssss/masroufi.git)
 cd masroufi
 ```
 
@@ -108,7 +108,7 @@ Ce projet utilise **React 19** et **Expo SDK 54** (versions "Bleeding Edge"). Af
 ```bash
 npm install --legacy-peer-deps
 ```
-*(Note : N'utilisez pas ```bash npm install ``` standard, car cela pourrait échouer en raison des exigences strictes de React 19).*
+*(Note : N'utilisez pas ```npm install ``` standard, car cela pourrait échouer en raison des exigences strictes de React 19).*
 
 ### 4. Lancer l'application
 Démarrez le serveur de développement en vidant le cache pour garantir une compilation propre :
