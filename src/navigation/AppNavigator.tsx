@@ -1,40 +1,70 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { Platform } from 'react-native';
+// 1. Import de l'outil de calcul automatique
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// --- IMPORTS DES ÉCRANS ---
+// Imports Écrans
 import { DashboardScreen } from '../screens/DashboardScreen';
 import { AddTransactionScreen } from '../screens/AddTransactionScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { StatsScreen } from '../screens/StatsScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
-
-// --- ICONS & THEME ---
-import { LayoutDashboard, PieChart, Settings } from 'lucide-react-native';
-import { THEME } from '../constants/categories';
-
 import { CategoryListScreen } from '../screens/CategoryListScreen';
 import { EditCategoryScreen } from '../screens/EditCategoryScreen';
+
+import { LayoutDashboard, PieChart, Settings } from 'lucide-react-native';
+import { THEME } from '../constants/categories';
+import { useThemeColor } from '../hooks/useThemeColor';
+import { useStore } from '../store/useStore';
+
+import { RecurringListScreen } from '../screens/RecurringListScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Helper pour contourner le bug TypeScript de React 19 avec Lucide
 const TabIcon = ({ icon: Icon, color }: { icon: any, color: string }) => {
-  // On force le composant en 'any' pour éviter l'erreur de type
   const IconComponent = Icon as any; 
   return <IconComponent color={color} size={24} />;
 };
 
 function TabNavigator() {
+  const colors = useThemeColor();
+  // 2. On récupère les dimensions exactes de la "zone de danger" du téléphone
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: THEME.colors.primary,
-        tabBarInactiveTintColor: '#999',
-        tabBarStyle: { height: 60, paddingBottom: 10 }
+        tabBarInactiveTintColor: colors.subText,
+        tabBarStyle: { 
+          // 3. Calcul automatique de la hauteur
+          // Base (65) + Zone Système (insets.bottom) + Marge (10)
+          height: 65 + insets.bottom + 10, 
+          
+          // Le padding du bas correspond exactement à la zone système + un peu d'espace
+          paddingBottom: insets.bottom + 10, 
+          paddingTop: 12,
+          
+          backgroundColor: colors.card,
+          borderTopWidth: 0,
+          borderTopColor: colors.border,
+          
+          elevation: 10,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          marginTop: 4,
+        }
       }}
     >
       <Tab.Screen 
@@ -63,8 +93,10 @@ function TabNavigator() {
 }
 
 export const AppNavigator = () => {
+  const { isDarkMode } = useStore();
+
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Main" component={TabNavigator} />
         <Stack.Screen 
@@ -73,18 +105,22 @@ export const AppNavigator = () => {
           options={{ presentation: 'modal' }} 
         />
         <Stack.Screen 
+          name="Historique"
+          component={HistoryScreen}
+          options={{ presentation: 'card', headerShown: false }} 
+        />
+        <Stack.Screen 
           name="CategoryList"
           component={CategoryListScreen}
         />
         <Stack.Screen 
           name="EditCategory"
           component={EditCategoryScreen}
-          options={{ presentation: 'modal' }} // Joli effet modal pour l'édition
+          options={{ presentation: 'modal' }}
         />
         <Stack.Screen 
-          name="Historique"
-          component={HistoryScreen}
-          options={{ presentation: 'card', headerShown: false }} 
+          name="RecurringList"
+          component={RecurringListScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

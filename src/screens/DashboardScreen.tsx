@@ -1,49 +1,54 @@
-import React from 'react';
+import React, { useCallback } from 'react'; // <--- Import useCallback
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native'; // <--- Import useFocusEffect
 import { Plus, AlertTriangle, Calendar } from 'lucide-react-native';
 
-// Imports Architecture
 import { useStore } from '../store/useStore';
 import { useFinancials } from '../hooks/useFinancials';
+import { useThemeColor } from '../hooks/useThemeColor';
 import { THEME } from '../constants/categories';
 import { BalanceCard } from '../components/organisms/BalanceCard';
 import { TransactionItem } from '../components/molecules/TransactionItem';
 import { formatDH } from '../utils/currency';
 
 export const DashboardScreen = ({ navigation }: any) => {
-  const { transactions, categories } = useStore();
-  
-  // On appelle le hook SANS date => Il prend automatiquement le mois en cours
+  const { transactions, categories, checkRecurringTransactions } = useStore();
   const { categoryStats, balance, totalIncome, expenses } = useFinancials(); 
+  const colors = useThemeColor();
 
-  // FIX: Force le type pour React 19
   const PlusIcon = Plus as any;
   const AlertIcon = AlertTriangle as any;
   const CalendarIcon = Calendar as any;
 
+  // CORRECTION MAJEURE ICI :
+  // On utilise useFocusEffect au lieu de useEffect.
+  // Cela garantit que la vérification se lance à CHAQUE fois qu'on revient sur l'écran.
+  useFocusEffect(
+    useCallback(() => {
+      checkRecurringTransactions();
+    }, [])
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
-        {/* Header Simple */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Masroufi 🇲🇦</Text>
-            <Text style={styles.subGreeting}>Aperçu du mois en cours</Text>
+            <Text style={[styles.greeting, { color: colors.text }]}>Masroufi 🇲🇦</Text>
+            <Text style={[styles.subGreeting, { color: colors.subText }]}>Aperçu du mois en cours</Text>
           </View>
         </View>
 
-        {/* Carte de Solde (Mois actuel) */}
         <BalanceCard 
             balance={balance} 
             income={totalIncome} 
             expenses={expenses} 
         />
 
-        {/* 🚨 ALERTE (Si solde négatif ce mois-ci) 🚨 */}
         {balance < 0 && (
-          <View style={styles.alertBox}>
+          <View style={[styles.alertBox, { backgroundColor: colors.isDark ? '#3E1010' : '#FFEBEE', borderLeftColor: '#D32F2F' }]}>
             <AlertIcon color="#D32F2F" size={24} />
             <View style={{marginLeft: 12, flex: 1}}>
                 <Text style={styles.alertTitle}>Attention !</Text>
@@ -54,16 +59,15 @@ export const DashboardScreen = ({ navigation }: any) => {
           </View>
         )}
 
-        {/* Visualisation (Barres) */}
         {categoryStats.length > 0 ? (
-          <View style={styles.statsContainer}>
-            <Text style={styles.sectionTitle}>Répartition des dépenses</Text>
+          <View style={[styles.statsContainer, { backgroundColor: colors.card }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Répartition des dépenses</Text>
             
             {categoryStats.map((item) => (
               <View key={item.id} style={styles.statRow}>
                 <View style={styles.statHeader}>
                   <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-                      <Text style={[styles.statName, item.isOverBudget && {color: '#D32F2F'}]} numberOfLines={1}>
+                      <Text style={[styles.statName, { color: colors.text }, item.isOverBudget && {color: '#D32F2F'}]} numberOfLines={1}>
                         {item.name}
                       </Text>
                       {item.isOverBudget && (
@@ -75,7 +79,7 @@ export const DashboardScreen = ({ navigation }: any) => {
                   <Text style={styles.statVal}>{Math.round(item.percent)}%</Text>
                 </View>
                 
-                <View style={styles.progressBarBg}>
+                <View style={[styles.progressBarBg, { backgroundColor: colors.isDark ? '#333' : '#f0f0f0' }]}>
                     <View style={[
                         styles.progressBarFill, 
                         { width: `${item.percent}%`, backgroundColor: item.color }
@@ -84,7 +88,7 @@ export const DashboardScreen = ({ navigation }: any) => {
                 
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 4}}>
                     {item.limit > 0 ? (
-                        <Text style={{fontSize: 10, color: '#999'}}>Max: {formatDH(item.limit)}</Text>
+                        <Text style={{fontSize: 10, color: colors.subText}}>Max: {formatDH(item.limit)}</Text>
                     ) : <View/>}
                     <Text style={[styles.statAmount, item.isOverBudget && {color: '#D32F2F', fontWeight: 'bold'}]}>
                         {formatDH(item.amount)}
@@ -95,14 +99,13 @@ export const DashboardScreen = ({ navigation }: any) => {
           </View>
         ) : (
           <View style={styles.emptyState}>
-             <CalendarIcon size={40} color="#ddd" />
-             <Text style={styles.emptyText}>Rien pour ce mois-ci.</Text>
+             <CalendarIcon size={40} color={colors.subText} />
+             <Text style={[styles.emptyText, { color: colors.subText }]}>Rien pour ce mois-ci.</Text>
           </View>
         )}
 
-        {/* Liste Récente (Globale) */}
         <View style={styles.listHeader}>
-          <Text style={styles.sectionTitle}>Derniers ajouts</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Derniers ajouts</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Historique')}>
             <Text style={{color: THEME.colors.primary, fontWeight:'600'}}>Tout voir</Text>
           </TouchableOpacity>
@@ -116,7 +119,6 @@ export const DashboardScreen = ({ navigation }: any) => {
 
       </ScrollView>
 
-      {/* FAB */}
       <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('AddTransaction')}>
         <PlusIcon color="#FFF" size={32} />
       </TouchableOpacity>
@@ -125,38 +127,27 @@ export const DashboardScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: THEME.colors.background },
+  container: { flex: 1 },
   scrollContent: { padding: 20, paddingBottom: 100 },
-  
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  greeting: { fontSize: 22, fontWeight: 'bold', color: THEME.colors.text },
-  subGreeting: { fontSize: 13, color: THEME.colors.subtext },
-
-  alertBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFEBEE', padding: 12, borderRadius: 12, marginBottom: 20, borderLeftWidth: 4, borderLeftColor: '#D32F2F' },
+  greeting: { fontSize: 22, fontWeight: 'bold' },
+  subGreeting: { fontSize: 13 },
+  alertBox: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 12, marginBottom: 20, borderLeftWidth: 4 },
   alertTitle: { color: '#D32F2F', fontWeight: 'bold', fontSize: 14 },
   alertText: { color: '#C62828', fontSize: 12 },
-
-  statsContainer: { backgroundColor: '#fff', padding: 15, borderRadius: 16, marginBottom: 20 },
+  statsContainer: { padding: 15, borderRadius: 16, marginBottom: 20 },
   sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 15 },
   statRow: { marginBottom: 15 },
   statHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
-  statName: { fontWeight: '600', color: THEME.colors.text, maxWidth: '60%' },
+  statName: { fontWeight: '600', maxWidth: '60%' },
   statVal: { color: '#999', fontSize: 12 },
-  
-  progressBarBg: { height: 8, backgroundColor: '#f0f0f0', borderRadius: 4, overflow: 'hidden' },
+  progressBarBg: { height: 8, borderRadius: 4, overflow: 'hidden' },
   progressBarFill: { height: '100%', borderRadius: 4 },
   statAmount: { fontSize: 12, color: '#666', marginTop: 4, textAlign: 'right' },
-  
   badgeError: { marginLeft: 8, backgroundColor: '#FFEBEE', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
   badgeText: { color: '#D32F2F', fontSize: 10, fontWeight: 'bold' },
-
   listHeader: { flexDirection:'row', justifyContent:'space-between', marginBottom: 10, alignItems:'center' },
   emptyState: { padding: 20, alignItems: 'center' },
-  emptyText: { color: '#999', marginTop: 10 },
-  
-  fab: {
-    position: 'absolute', bottom: 20, right: 20, width: 60, height: 60,
-    borderRadius: 30, backgroundColor: THEME.colors.primary,
-    justifyContent: 'center', alignItems: 'center', elevation: 5
-  }
+  emptyText: { marginTop: 10 },
+  fab: { position: 'absolute', bottom: 20, right: 20, width: 60, height: 60, borderRadius: 30, backgroundColor: THEME.colors.primary, justifyContent: 'center', alignItems: 'center', elevation: 5, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 4.65 }
 });

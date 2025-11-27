@@ -2,7 +2,7 @@
   "expo": {
     "name": "Masroufi",
     "slug": "Masroufi",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,8 @@
       },
       "package": "com.headlessssssssssss.masroufi",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "versionCode": "2"
     },
     "web": {
       "favicon": "./assets/favicon.png"

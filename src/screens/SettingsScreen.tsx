@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Switch } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Save, Trash2, Tag, ChevronRight, FileText, Moon, Sun, Repeat } from 'lucide-react-native';
+
+// Imports Architecture
 import { useStore } from '../store/useStore';
 import { THEME } from '../constants/categories';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Save, Trash2, Tag, ChevronRight, FileText, Moon, Sun } from 'lucide-react-native';
 import { generatePDF } from '../utils/pdfGenerator';
+import { useThemeColor } from '../hooks/useThemeColor'; // Hook de thème
 
 export const SettingsScreen = ({ navigation }: any) => {
   const { monthlyIncome, setMonthlyIncome, reset, transactions, categories, isDarkMode, toggleTheme } = useStore();
   const [incomeInput, setIncomeInput] = useState(monthlyIncome.toString());
+  
+  // Récupération des couleurs dynamiques (Mode Sombre / Clair)
+  const colors = useThemeColor();
 
-  // FIX: Force le type pour React 19
+  // FIX: Force le type pour React 19 (Compatibilité Lucide)
   const SaveIcon = Save as any;
   const TrashIcon = Trash2 as any;
   const TagIcon = Tag as any;
@@ -18,13 +24,9 @@ export const SettingsScreen = ({ navigation }: any) => {
   const FileIcon = FileText as any;
   const MoonIcon = Moon as any;
   const SunIcon = Sun as any;
+  const RepeatIcon = Repeat as any;
 
-  // Couleurs dynamiques selon le mode
-  const bgColor = isDarkMode ? '#121212' : THEME.colors.background;
-  const cardColor = isDarkMode ? '#1E1E1E' : '#FFFFFF';
-  const textColor = isDarkMode ? '#FFFFFF' : THEME.colors.text;
-  const subTextColor = isDarkMode ? '#AAAAAA' : THEME.colors.subtext;
-
+  // Mise à jour de l'input si le store change
   useEffect(() => {
     setIncomeInput(monthlyIncome.toString());
   }, [monthlyIncome]);
@@ -48,59 +50,60 @@ export const SettingsScreen = ({ navigation }: any) => {
   };
 
   const handleReset = () => {
-    Alert.alert(
-      "Attention ⚠️",
-      "Voulez-vous vraiment effacer TOUT l'historique ?",
-      [
+    Alert.alert("Attention ⚠️", "Voulez-vous vraiment effacer TOUT l'historique ?", [
         { text: "Annuler", style: "cancel" },
-        { 
-          text: "Tout Effacer", 
-          style: "destructive", 
-          onPress: () => {
-            reset();
-            setIncomeInput('0');
-            Alert.alert("Reset effectué", "L'application a été remise à zéro.");
-          }
-        }
-      ]
-    );
+        { text: "Tout Effacer", style: "destructive", onPress: () => { reset(); setIncomeInput('0'); }}
+    ]);
   };
 
+  // --- LOGIQUE COULEURS DES ICÔNES ---
+  // Adaptation subtile des fonds d'icônes en mode sombre pour ne pas éblouir
+  const iconBgBlue = colors.isDark ? 'rgba(33, 150, 243, 0.15)' : '#E3F2FD';
+  const iconBgGreen = colors.isDark ? 'rgba(76, 175, 80, 0.15)' : '#E8F5E9';
+  const iconBgOrange = colors.isDark ? 'rgba(255, 152, 0, 0.15)' : '#FFF3E0';
+  
+  const iconColorBlue = colors.isDark ? '#64B5F6' : '#2196F3';
+  const iconColorGreen = colors.isDark ? '#81C784' : '#4CAF50';
+  const iconColorOrange = colors.isDark ? '#FFB74D' : '#FF9800';
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { backgroundColor: cardColor, borderBottomColor: isDarkMode ? '#333' : '#eee' }]}>
-        <Text style={[styles.title, { color: textColor }]}>Paramètres</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>Paramètres</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         
         {/* --- Section 1 : Apparence --- */}
-        <View style={[styles.section, { backgroundColor: cardColor }]}>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
             <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
                 <View style={{flexDirection:'row', alignItems:'center'}}>
                     {isDarkMode ? <MoonIcon color="#90CAF9" size={24} /> : <SunIcon color="orange" size={24} />}
-                    <Text style={[styles.menuText, { marginLeft: 10, color: textColor }]}>Mode Sombre</Text>
+                    <Text style={[styles.menuText, { marginLeft: 10, color: colors.text }]}>Mode Sombre</Text>
                 </View>
                 <Switch 
                     value={isDarkMode} 
                     onValueChange={toggleTheme}
                     trackColor={{false: '#767577', true: THEME.colors.primary}}
+                    thumbColor={isDarkMode ? "#fff" : "#f4f3f4"}
                 />
             </View>
         </View>
 
         {/* --- Section 2 : Revenu --- */}
-        <View style={[styles.section, { backgroundColor: cardColor }]}>
-          <Text style={[styles.sectionTitle, { color: textColor }]}>Revenu Mensuel Fixe</Text>
-          <View style={[styles.inputContainer, { backgroundColor: isDarkMode ? '#2C2C2C' : '#FAFAFA', borderColor: isDarkMode ? '#444' : '#ddd' }]}>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Revenu Mensuel Fixe</Text>
+          <View style={[styles.inputContainer, { backgroundColor: colors.isDark ? '#2C2C2C' : '#FAFAFA', borderColor: colors.border }]}>
             <Text style={styles.currency}>DH</Text>
             <TextInput 
-              style={[styles.input, { color: textColor }]}
+              style={[styles.input, { color: colors.text }]}
               keyboardType="numeric"
               value={incomeInput}
               onChangeText={setIncomeInput}
               placeholder="0"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.subText}
             />
           </View>
           <TouchableOpacity style={styles.saveBtn} onPress={handleSaveIncome}>
@@ -109,35 +112,55 @@ export const SettingsScreen = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
 
-        {/* --- Section 3 : Actions --- */}
-        <View style={[styles.section, { backgroundColor: cardColor }]}>
-          <Text style={[styles.sectionTitle, { color: textColor }]}>Gestion</Text>
+        {/* --- Section 3 : Gestion --- */}
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Gestion</Text>
 
           {/* Modifier Catégories */}
-          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('CategoryList')}>
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderBottomColor: colors.border }]} 
+            onPress={() => navigation.navigate('CategoryList')}
+          >
             <View style={styles.menuLeft}>
-                <View style={[styles.iconBox, { backgroundColor: '#E3F2FD' }]}>
-                    <TagIcon color="#2196F3" size={20} />
+                <View style={[styles.iconBox, { backgroundColor: iconBgBlue }]}>
+                    <TagIcon color={iconColorBlue} size={20} />
                 </View>
-                <Text style={[styles.menuText, { color: textColor }]}>Modifier les catégories</Text>
+                <Text style={[styles.menuText, { color: colors.text }]}>Modifier les catégories</Text>
             </View>
-            <ChevronIcon color="#ccc" size={20} />
+            <ChevronIcon color={colors.subText} size={20} />
+          </TouchableOpacity>
+
+          {/* Charges Fixes (NOUVEAU) */}
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderBottomColor: colors.border }]} 
+            onPress={() => navigation.navigate('RecurringList')}
+          >
+            <View style={styles.menuLeft}>
+                <View style={[styles.iconBox, { backgroundColor: iconBgOrange }]}>
+                    <RepeatIcon color={iconColorOrange} size={20} />
+                </View>
+                <Text style={[styles.menuText, { color: colors.text }]}>Charges fixes & Abonnements</Text>
+            </View>
+            <ChevronIcon color={colors.subText} size={20} />
           </TouchableOpacity>
           
           {/* Export PDF */}
-          <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={handleExport}>
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderBottomWidth: 0 }]} 
+            onPress={handleExport}
+          >
             <View style={styles.menuLeft}>
-                <View style={[styles.iconBox, { backgroundColor: '#E8F5E9' }]}>
-                    <FileIcon color="#4CAF50" size={20} />
+                <View style={[styles.iconBox, { backgroundColor: iconBgGreen }]}>
+                    <FileIcon color={iconColorGreen} size={20} />
                 </View>
-                <Text style={[styles.menuText, { color: textColor }]}>Exporter en PDF</Text>
+                <Text style={[styles.menuText, { color: colors.text }]}>Exporter en PDF</Text>
             </View>
-            <ChevronIcon color="#ccc" size={20} />
+            <ChevronIcon color={colors.subText} size={20} />
           </TouchableOpacity>
         </View>
 
         {/* --- Section 4 : Danger --- */}
-        <View style={[styles.section, styles.dangerSection, { backgroundColor: cardColor, borderColor: '#ffcdd2' }]}>
+        <View style={[styles.section, styles.dangerSection, { backgroundColor: colors.card, borderColor: '#ffcdd2' }]}>
           <Text style={[styles.sectionTitle, { color: THEME.colors.danger }]}>Zone de Danger</Text>
           <TouchableOpacity style={styles.dangerBtn} onPress={handleReset}>
             <TrashIcon color="white" size={20} style={{marginRight: 10}} />
@@ -165,7 +188,7 @@ const styles = StyleSheet.create({
   saveBtn: { backgroundColor: THEME.colors.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 15, borderRadius: 12 },
   dangerBtn: { backgroundColor: THEME.colors.danger, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 15, borderRadius: 12 },
   btnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  menuItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
+  menuItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1 },
   menuLeft: { flexDirection: 'row', alignItems: 'center' },
   iconBox: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   menuText: { fontSize: 16, fontWeight: '500' },

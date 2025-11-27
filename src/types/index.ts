@@ -24,3 +24,12 @@ export interface MonthlyBudget {
   month: string; // "MM-YYYY"
   limit: number;
 }
+
+export interface RecurringExpense {
+  id: string;
+  name: string;
+  amount: number;
+  categoryId: string;
+  dayOfMonth: number; // Le jour du prélèvement (ex: le 1, le 30...)
+  lastAppliedDate?: string; // Pour savoir si on l'a déjà payée ce mois-ci
+}

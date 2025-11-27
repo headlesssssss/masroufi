@@ -14,6 +14,7 @@ L'application est développée avec les technologies les plus récentes de l'éc
 * **Alertes Budgétaires :**
     * **Alerte globale :** Si le solde du mois devient négatif.
     * **Alerte catégorielle :** Si une catégorie dépasse son plafond défini (ex: "Budget Café dépassé").
+* **Charges Fixes :** Gestion des prélèvements récurrents (Loyer, Netflix, Salle de sport...). L'application génère automatiquement la transaction le jour J.
 
 ### Analyse Financière
 * **Comparaison Temporelle :** Analyse des variations par rapport au mois précédent (ex: "Dépenses : -10% vs Octobre").
@@ -53,37 +54,39 @@ Le projet suit une architecture **Atomique** et modulaire ("Clean Architecture")
 ```text
 src/
 ├── components/           # Composants d'interface (UI) réutilisables
-│   ├── atoms/            # Éléments de base (Boutons, Inputs, Textes...)
-│   ├── molecules/        # Assemblages simples (Ligne de transaction, Badge...)
-│   └── organisms/        # Blocs complexes autonomes (Carte de Solde, Graphiques...)
+│   ├── atoms/            # Éléments de base (Boutons, Inputs...)
+│   ├── molecules/        # Assemblages simples (Ligne de transaction...)
+│   └── organisms/        # Blocs complexes (Carte de Solde, Graphiques...)
 │
 ├── constants/            # Données statiques
-│   ├── categories.ts     # Configuration par défaut des catégories (Couleurs, Noms)
-│   └── icons.ts          # Registre centralisé des icônes (Lucide React Native)
+│   ├── categories.ts     # Configuration des catégories (Couleurs, Noms)
+│   └── icons.ts          # Registre centralisé des icônes
 │
 ├── hooks/                # Logique métier (Custom Hooks)
-│   └── useFinancials.ts  # Cerveau de l'app : calcul des soldes, stats, comparaisons et alertes
+│   ├── useFinancials.ts  # Calculs financiers (Solde, Stats, Alertes)
+│   └── useThemeColor.ts  # Gestion centralisée du Mode Sombre/Clair
 │
 ├── navigation/           # Configuration de la navigation
-│   └── AppNavigator.tsx  # Définition des Onglets (Tabs) et de la Pile (Stack)
+│   └── AppNavigator.tsx  # Définition des Onglets et de la Pile (Stack)
 │
 ├── screens/              # Écrans de l'application
-│   ├── DashboardScreen   # Accueil : Solde, Alertes budget, Barres de progression
-│   ├── StatsScreen       # Statistiques : Comparaison N-1, Taux d'épargne, Jauges
-│   ├── HistoryScreen     # Historique : Liste des transactions filtrable par mois
-│   ├── AddTransaction    # Formulaire : Ajout et modification de dépenses/revenus
-│   ├── SettingsScreen    # Paramètres : Mode sombre, Export PDF, Revenu fixe
+│   ├── DashboardScreen   # Accueil : Solde, Alertes, Barres de progression
+│   ├── StatsScreen       # Statistiques : Comparaison N-1, Taux d'épargne
+│   ├── HistoryScreen     # Historique : Liste filtrable par mois
+│   ├── AddTransaction    # Formulaire : Ajout/Modif de dépenses
+│   ├── SettingsScreen    # Paramètres : Mode sombre, PDF, Revenu fixe
 │   ├── CategoryList      # Gestion : Liste des catégories personnalisables
-│   └── EditCategory      # Édition : Changement d'icône et de limite budgétaire
+│   ├── EditCategory      # Édition : Icônes et limites budgétaires
+│   └── RecurringList     # Nouveau : Gestion des charges fixes & abonnements
 │
 ├── store/                # Gestion d'état global
-│   └── useStore.ts       # Store Zustand persistant (sauvegarde automatique sur le téléphone)
+│   └── useStore.ts       # Store Zustand persistant (AsyncStorage)
 │
-├── types/                # Définitions TypeScript (Interfaces et Types globaux)
+├── types/                # Définitions TypeScript
 │
 └── utils/                # Fonctions utilitaires
     ├── currency.ts       # Formatage monétaire (DH)
-    └── pdfGenerator.ts   # Génération de rapports HTML/PDF
+    └── pdfGenerator.ts   # Génération de rapports PDF
 ```
 
 ## Installation et Exécution
