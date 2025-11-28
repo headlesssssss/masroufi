@@ -103,7 +103,7 @@ Suivez ces instructions étape par étape pour configurer et lancer le projet su
 
 ### 2. Récupération du projet
 ```bash
-git clone [https://github.com/votre-compte/masroufi.git](https://github.com/votre-compte/masroufi.git)
+git clone [https://github.com/headlesssssss/masroufi.git](https://github.com/headlesssssdfgs/masroufi.git)
 cd masroufi
 ```
 
