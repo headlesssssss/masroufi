@@ -93,6 +93,8 @@ src/
     └── pdfGenerator.ts   # Génération de rapports PDF
 ```
 
+---
+
 ## Installation et Exécution
 
 Suivez ces instructions étape par étape pour configurer et lancer le projet sur votre machine.
@@ -103,7 +105,7 @@ Suivez ces instructions étape par étape pour configurer et lancer le projet su
 
 ### 2. Récupération du projet
 ```bash
-git clone [https://github.com/headlesssssss/masroufi.git](https://github.com/headlesssssdfgs/masroufi.git)
+git clone [https://github.com/headlesssssss/masroufi.git](https://github.com/headlesssss/masroufi.git)
 cd masroufi
 ```
 
