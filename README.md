@@ -16,6 +16,10 @@ L'application est développée avec les technologies les plus récentes de l'éc
     * **Alerte catégorielle :** Si une catégorie dépasse son plafond défini (ex: "Budget Café dépassé").
 * **Charges Fixes :** Gestion des prélèvements récurrents (Loyer, Netflix, Salle de sport...). L'application génère automatiquement la transaction le jour J.
 
+### Alertes & Budgets
+* **Alerte Globale :** Si le solde du mois devient négatif.
+* **Alerte Catégorie :** Si un poste de dépense dépasse son plafond défini (ex: "Budget Café dépassé").
+
 ### Analyse Financière
 * **Comparaison Temporelle :** Analyse des variations par rapport au mois précédent (ex: "Dépenses : -10% vs Octobre").
 * **Taux d'Épargne :** Jauge dynamique indiquant le pourcentage de revenu épargné.
@@ -77,7 +81,7 @@ src/
 │   ├── SettingsScreen    # Paramètres : Mode sombre, PDF, Revenu fixe
 │   ├── CategoryList      # Gestion : Liste des catégories personnalisables
 │   ├── EditCategory      # Édition : Icônes et limites budgétaires
-│   └── RecurringList     # Nouveau : Gestion des charges fixes & abonnements
+│   └── RecurringList     # Recurrance : Gestion des charges fixes & abonnements
 │
 ├── store/                # Gestion d'état global
 │   └── useStore.ts       # Store Zustand persistant (AsyncStorage)
@@ -99,7 +103,7 @@ Suivez ces instructions étape par étape pour configurer et lancer le projet su
 
 ### 2. Récupération du projet
 ```bash
-git clone [https://github.com/headlesssssss/masroufi.git](https://github.com/headlesssssss/masroufi.git)
+git clone [https://github.com/votre-compte/masroufi.git](https://github.com/votre-compte/masroufi.git)
 cd masroufi
 ```
 
@@ -108,7 +112,7 @@ Ce projet utilise **React 19** et **Expo SDK 54** (versions "Bleeding Edge"). Af
 ```bash
 npm install --legacy-peer-deps
 ```
-*(Note : N'utilisez pas ```npm install ``` standard, car cela pourrait échouer en raison des exigences strictes de React 19).*
+*(Note : N'utilisez pas ```bash npm install ``` standard, car cela pourrait échouer en raison des exigences strictes de React 19).*
 
 ### 4. Lancer l'application
 Démarrez le serveur de développement en vidant le cache pour garantir une compilation propre :
